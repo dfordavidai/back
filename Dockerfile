@@ -1,10 +1,10 @@
 FROM python:3.11-slim
 
-# Install Tesseract OCR + English data via apt
 RUN apt-get update && apt-get install -y \
     tesseract-ocr \
     tesseract-ocr-eng \
     libgcc-s1 \
+    curl \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -17,4 +17,5 @@ COPY server.py .
 
 EXPOSE 8000
 
-CMD uvicorn server:app --host 0.0.0.0 --port ${PORT:-8000}
+# Use shell script so $PORT is properly resolved at runtime
+CMD ["sh", "-c", "uvicorn server:app --host 0.0.0.0 --port ${PORT:-8000} --workers 1"]
